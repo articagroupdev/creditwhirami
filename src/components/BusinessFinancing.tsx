@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { CheckCircle, Clock, DollarSign, TrendingUp, Shield, Zap, Building2, Calculator, CreditCard, Gift } from 'lucide-react'
+import { CheckCircle, Clock, DollarSign, TrendingUp, Shield, Building2, CreditCard, Gift } from 'lucide-react'
 
 const BusinessFinancing = () => {
   return (
@@ -205,7 +205,7 @@ const BusinessFinancing = () => {
               </div>
               <h4 className="text-xl font-bold text-gray-900 mb-4">Qualify</h4>
               <p className="text-gray-600 leading-relaxed">
-                We'll analyze your credit and business profile, then either start the funding process or fix any issues holding you back.
+                We&apos;ll analyze your credit and business profile, then either start the funding process or fix any issues holding you back.
               </p>
               {/* Connector Line */}
               <div className="hidden md:block absolute top-10 left-1/2 w-full h-0.5 bg-gradient-to-r from-green-300 to-purple-300 z-0"></div>

@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { CheckCircle, Award, TrendingUp, Heart, Shield, Target, DollarSign, Gift } from 'lucide-react'
+import { Heart, DollarSign, Gift } from 'lucide-react'
 
 const About = () => {
   return (
