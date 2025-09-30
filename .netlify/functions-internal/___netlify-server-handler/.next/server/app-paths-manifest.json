@@ -1,0 +1,15 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/appointments/[id]/route": "app/api/appointments/[id]/route.js",
+  "/api/admin/auth/route": "app/api/admin/auth/route.js",
+  "/admin/page": "app/admin/page.js",
+  "/api/appointments/[id]/actions/route": "app/api/appointments/[id]/actions/route.js",
+  "/api/send-appointment-notification/route": "app/api/send-appointment-notification/route.js",
+  "/api/test-appointment/route": "app/api/test-appointment/route.js",
+  "/api/appointments/route": "app/api/appointments/route.js",
+  "/application/page": "app/application/page.js",
+  "/api/submit-application/route": "app/api/submit-application/route.js",
+  "/page": "app/page.js",
+  "/test/page": "app/test/page.js",
+  "/api/consultation/route": "app/api/consultation/route.js"
+}

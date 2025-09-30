@@ -1,0 +1,36 @@
+{
+  "name": "credit-with-rami",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/network-info.js && next dev -H 0.0.0.0 -p 3000",
+    "dev:network": "node scripts/network-info.js && next dev -H 0.0.0.0 -p 3000",
+    "dev:local": "next dev -p 3000",
+    "build": "next build",
+    "start": "node scripts/network-info.js && next start -H 0.0.0.0 -p 3000",
+    "start:network": "node scripts/network-info.js && next start -H 0.0.0.0 -p 3000",
+    "network-info": "node scripts/network-info.js",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "lucide-react": "^0.300.0",
+    "next": "^14.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^14.0.4",
+    "netlify-cli": "^23.8.0",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.3.0"
+  }
+}

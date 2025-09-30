@@ -1,0 +1,52 @@
+{
+  "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-9d964d8cb0d81fe9.js",
+      "static/chunks/fd9d1056-d0699c359ef5901f.js",
+      "static/chunks/117-84c6523ecf867b70.js",
+      "static/chunks/main-app-a9b39d4cc1264f98.js",
+      "static/chunks/app/_not-found/page-e70e73dccfa05a8b.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack-9d964d8cb0d81fe9.js",
+      "static/chunks/fd9d1056-d0699c359ef5901f.js",
+      "static/chunks/117-84c6523ecf867b70.js",
+      "static/chunks/main-app-a9b39d4cc1264f98.js",
+      "static/css/e3ad10b16a6f4c66.css",
+      "static/chunks/app/layout-a070258c1fc3e845.js"
+    ],
+    "/admin/page": [
+      "static/chunks/webpack-9d964d8cb0d81fe9.js",
+      "static/chunks/fd9d1056-d0699c359ef5901f.js",
+      "static/chunks/117-84c6523ecf867b70.js",
+      "static/chunks/main-app-a9b39d4cc1264f98.js",
+      "static/chunks/616-f7fb876f96c2c142.js",
+      "static/chunks/app/admin/page-eb3eb199b92ca611.js"
+    ],
+    "/application/page": [
+      "static/chunks/webpack-9d964d8cb0d81fe9.js",
+      "static/chunks/fd9d1056-d0699c359ef5901f.js",
+      "static/chunks/117-84c6523ecf867b70.js",
+      "static/chunks/main-app-a9b39d4cc1264f98.js",
+      "static/chunks/616-f7fb876f96c2c142.js",
+      "static/chunks/341-f5257d204aeb6b2e.js",
+      "static/chunks/app/application/page-4b4b5794e87a96ea.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-9d964d8cb0d81fe9.js",
+      "static/chunks/fd9d1056-d0699c359ef5901f.js",
+      "static/chunks/117-84c6523ecf867b70.js",
+      "static/chunks/main-app-a9b39d4cc1264f98.js",
+      "static/chunks/616-f7fb876f96c2c142.js",
+      "static/chunks/341-f5257d204aeb6b2e.js",
+      "static/chunks/app/page-f10e3b33a4df1075.js"
+    ],
+    "/test/page": [
+      "static/chunks/webpack-9d964d8cb0d81fe9.js",
+      "static/chunks/fd9d1056-d0699c359ef5901f.js",
+      "static/chunks/117-84c6523ecf867b70.js",
+      "static/chunks/main-app-a9b39d4cc1264f98.js",
+      "static/chunks/app/test/page-0bf42471ae8fc8bc.js"
+    ]
+  }
+}

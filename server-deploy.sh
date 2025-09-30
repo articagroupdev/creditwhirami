@@ -36,3 +36,7 @@ echo "🌐 Application should be running on port 3000"
 echo "📋 Check logs with: pm2 logs credit-with-rami"
 
 
+
+
+
+

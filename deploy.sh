@@ -24,3 +24,7 @@ echo "3. Install dependencies: npm install --production"
 echo "4. Start with PM2: pm2 start ecosystem.config.js"
 
 
+
+
+
+
