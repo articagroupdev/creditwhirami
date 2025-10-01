@@ -1,27 +1,51 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
+  // experimental: {
+  //   optimizeCss: true,
+  // },
   images: {
-    unoptimized: true,
-    formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '3000',
-        pathname: '/**',
-      },
-      {
-        protocol: 'http',
-        hostname: '**',
-        port: '3000',
-        pathname: '/**',
+        protocol: 'https',
+        hostname: 'ui-avatars.com',
+        port: '',
+        pathname: '/api/**',
       },
     ],
+    formats: ['image/webp', 'image/avif'],
   },
+  // Video optimization
+  async headers() {
+    return [
+      {
+        source: '/rami-video.mp4',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+          {
+            key: 'Content-Type',
+            value: 'video/mp4',
+          },
+        ],
+      },
+      {
+        source: '/video-poster.jpg',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ]
+  },
+  // Compression
+  compress: true,
+  // Performance optimizations
+  poweredByHeader: false,
+  generateEtags: false,
 }
 
 module.exports = nextConfig

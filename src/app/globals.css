@@ -78,6 +78,12 @@
   .animate-input-error {
     animation: inputError 0.4s ease-out forwards;
   }
+  
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+    opacity: 0;
+    transform: translateY(30px);
+  }
 }
 
 @layer utilities {
@@ -200,6 +206,17 @@
   100% {
     transform: translateX(0);
     border-color: rgb(239, 68, 68);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

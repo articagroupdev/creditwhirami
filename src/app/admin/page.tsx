@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
-import { Calendar, Clock, User, Phone, Mail, Building, CheckCircle, AlertCircle, X, LogOut, Search, Filter, Download, TrendingUp, Users, DollarSign, BarChart3, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react'
+import { Calendar, Clock, User, Phone, Mail, Building, CheckCircle, AlertCircle, X, LogOut, Search, Filter, Download, TrendingUp, Users, BarChart3, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react'
 import { Appointment, reloadAppointments } from '@/lib/database'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -79,8 +79,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
       } else {
         alert('Invalid credentials')
       }
-    } catch (error) {
-      console.error('Login error:', error)
+    } catch {
       alert('Login failed')
     } finally {
       setIsLoggingIn(false)
@@ -95,23 +94,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
 
   const fetchAppointments = useCallback(async (forceRefresh = false) => {
     try {
-      console.log('Fetching appointments, forceRefresh:', forceRefresh)
       
       // If force refresh, always get from API
       if (forceRefresh) {
-        console.log('Force refresh - fetching from API')
         const response = await fetch('/api/appointments')
         const data = await response.json()
         
         if (data.success) {
-          console.log('API appointments received:', data.appointments)
           setAppointments(data.appointments)
           calculateStats(data.appointments)
           
           // Update localStorage with fresh data
           if (typeof window !== 'undefined') {
             localStorage.setItem('appointments', JSON.stringify(data.appointments))
-            console.log('localStorage updated with fresh API data')
           }
         }
         return
@@ -120,7 +115,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
       // First reload from localStorage
       const localAppointments = reloadAppointments()
       if (localAppointments.length > 0) {
-        console.log('Using localStorage appointments:', localAppointments)
         setAppointments(localAppointments)
         calculateStats(localAppointments)
         setLoading(false)
@@ -128,23 +122,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
       }
 
       // If no local data, try API
-      console.log('No localStorage data, fetching from API')
       const response = await fetch('/api/appointments')
       const data = await response.json()
       
       if (data.success) {
-        console.log('API appointments received:', data.appointments)
         setAppointments(data.appointments)
         calculateStats(data.appointments)
         
         // Save to localStorage
         if (typeof window !== 'undefined') {
           localStorage.setItem('appointments', JSON.stringify(data.appointments))
-          console.log('localStorage updated with API data')
         }
       }
-    } catch (error) {
-      console.error('Error fetching appointments:', error)
+    } catch {
     } finally {
       setLoading(false)
     }
@@ -173,8 +163,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
 
 
   const calculateStats = (appointments: Appointment[]) => {
-    console.log('=== CALCULATING STATS ===')
-    console.log('Total appointments:', appointments.length)
     
     const total = appointments.length
     const eligible = appointments.filter(app => app.isEligible).length
@@ -183,13 +171,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
     const completed = appointments.filter(app => app.status === 'completed').length
     const cancelled = appointments.filter(app => app.status === 'cancelled').length
 
-    console.log('Stats breakdown:')
-    console.log('- Total:', total)
-    console.log('- Eligible:', eligible)
-    console.log('- Pending:', pending)
-    console.log('- Confirmed:', confirmed)
-    console.log('- Completed:', completed)
-    console.log('- Cancelled:', cancelled)
 
     const newStats = {
       total,
@@ -201,9 +182,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
       eligibilityRate: total > 0 ? (eligible / total) * 100 : 0
     }
 
-    console.log('Setting new stats:', newStats)
     setStats(newStats)
-    console.log('=== STATS CALCULATED ===')
   }
 
 
@@ -249,10 +228,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
     setUpdateMessage(null)
 
     try {
-      console.log(`=== EXECUTING ${action.toUpperCase()} ACTION ===`)
-      console.log(`Appointment ID: ${id}`)
-      console.log(`Action: ${action}`)
-      console.log(`Selected appointment:`, selectedAppointment)
       
       const response = await fetch(`/api/appointments/${id}/actions`, {
         method: 'POST',
@@ -262,21 +237,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
         body: JSON.stringify({ action }),
       })
 
-      console.log(`Response status: ${response.status}`)
       const data = await response.json()
-      console.log(`${action} action response:`, data)
 
       if (data.success) {
-        console.log(`✅ ${action.toUpperCase()} ACTION SUCCESSFUL`)
-        console.log(`Previous status: ${data.previousStatus}`)
-        console.log(`New status: ${data.newStatus}`)
-        console.log(`Updated appointment:`, data.appointment)
         
         // Update the selected appointment with new status
         if (selectedAppointment && selectedAppointment.id === id) {
           const updatedAppointment = { ...selectedAppointment, status: data.newStatus }
           setSelectedAppointment(updatedAppointment)
-          console.log('Updated selected appointment:', updatedAppointment)
         }
         
         // Add to action history
@@ -289,14 +257,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
           status: data.newStatus
         }
         setActionHistory(prev => [historyEntry, ...prev.slice(0, 9)]) // Keep last 10 actions
-        console.log('Added to action history:', historyEntry)
         
         // Send notification to client
-        console.log('Sending client notification...')
         await sendClientNotification(selectedAppointment!, data.newStatus)
         
         // Refresh appointments and stats with force refresh
-        console.log('Refreshing appointments and stats with force refresh...')
         await fetchAppointments(true)
         
         // Show success message
@@ -308,7 +273,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
           type: 'success',
           text: successMessage
         })
-        console.log('Success message set:', successMessage)
         
         // Auto-hide message after 3 seconds
         setTimeout(() => {
@@ -318,7 +282,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
         // Close modal after successful update
         setTimeout(() => {
           setSelectedAppointment(null)
-          console.log('Modal closed after successful update')
         }, 1500)
         
       } else {
@@ -327,8 +290,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
           text: data.error || `Failed to ${action} appointment`
         })
       }
-    } catch (error) {
-      console.error(`Error ${action}ing appointment:`, error)
+    } catch {
       setUpdateMessage({
         type: 'error',
         text: `Network error. Please try again.`
@@ -341,7 +303,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
 
   const sendClientNotification = async (appointment: Appointment, status: Appointment['status']) => {
     try {
-      console.log(`Sending notification to client ${appointment.name} about status: ${status}`)
       
       // Prepare notification data
       const notificationData = {
@@ -354,7 +315,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
         appointmentTime: appointment.preferredTime,
         status: status,
         eligibility: appointment.isEligible,
-        fundingAmount: appointment.fundingAmount,
         message: appointment.message
       }
 
@@ -371,9 +331,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
       })
 
       if (emailResponse.ok) {
-        console.log('Email notification sent successfully')
       } else {
-        console.warn('Failed to send email notification')
       }
 
       // Send WhatsApp notification (optional - opens WhatsApp web)
@@ -383,11 +341,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
         
         // Open WhatsApp in new tab
         window.open(whatsappUrl, '_blank')
-        console.log('WhatsApp notification opened')
       }
 
-    } catch (error) {
-      console.error('Error sending client notification:', error)
+    } catch {
     }
   }
 
@@ -487,8 +443,7 @@ Rami - Credit With Rami`
         app.preferredDate,
         app.preferredTime,
         app.status,
-        app.isEligible ? 'Yes' : 'No',
-        app.fundingAmount
+        app.isEligible ? 'Yes' : 'No'
       ].join(','))
     ].join('\n')
 
@@ -570,7 +525,7 @@ Rami - Credit With Rami`
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
               <Image 
-                src="/cwr-logo-2.png" 
+                src="/cwr-logo-1.png" 
                 alt="Credit With Rami Logo" 
                 width={350}
                 height={140}
@@ -754,34 +709,6 @@ Rami - Credit With Rami`
           </div>
         </div>
 
-        {/* Debug Info */}
-        <div className="bg-blue-500/20 border border-blue-400/30 rounded-xl p-4 mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-blue-200 text-sm">
-                <strong>Debug Info:</strong> {appointments.length} appointments loaded from localStorage
-              </p>
-              <p className="text-blue-300 text-xs">
-                Last updated: {new Date().toLocaleTimeString()}
-              </p>
-            </div>
-            <button
-              onClick={() => {
-                console.log('=== DASHBOARD DEBUG INFO ===')
-                console.log('Current appointments state:', appointments)
-                console.log('localStorage data:', localStorage.getItem('appointments'))
-                console.log('Stats:', stats)
-                console.log('Selected date:', selectedDate)
-                console.log('Current view:', currentView)
-                console.log('Action history:', actionHistory)
-                console.log('========================')
-              }}
-              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors"
-            >
-              Log Data
-            </button>
-          </div>
-        </div>
 
         {/* Action History Panel */}
         {actionHistory.length > 0 && (
@@ -1375,13 +1302,6 @@ Rami - Credit With Rami`
                           <p className="text-white">{selectedAppointment.businessType}</p>
                         </div>
                       </div>
-                      <div className="flex items-center">
-                        <DollarSign className="w-5 h-5 text-blue-300 mr-3" />
-                        <div>
-                          <p className="text-sm text-blue-200">Monthly Revenue</p>
-                          <p className="text-white">{selectedAppointment.monthlyRevenue}</p>
-                        </div>
-                      </div>
                     </div>
                     
                     <div className="space-y-4">
@@ -1412,24 +1332,6 @@ Rami - Credit With Rami`
                           </p>
                         </div>
                       </div>
-                      {selectedAppointment.fundingAmount && (
-                        <div className="flex items-center">
-                          <DollarSign className="w-5 h-5 text-blue-300 mr-3" />
-                          <div>
-                            <p className="text-sm text-blue-200">Funding Amount</p>
-                            <p className="text-white">{selectedAppointment.fundingAmount}</p>
-                          </div>
-                        </div>
-                      )}
-                      {selectedAppointment.urgency && (
-                        <div className="flex items-center">
-                          <AlertCircle className="w-5 h-5 text-blue-300 mr-3" />
-                          <div>
-                            <p className="text-sm text-blue-200">Urgency</p>
-                            <p className="text-white">{selectedAppointment.urgency}</p>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
                   

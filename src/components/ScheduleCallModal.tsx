@@ -14,7 +14,6 @@ interface FormData {
   phone: string
   businessName: string
   businessType: string
-  monthlyRevenue: string
   creditCards: string
   establishedBusiness: string
   strongCreditScore: string
@@ -23,8 +22,6 @@ interface FormData {
   preferredTime: string
   timezone: string
   message: string
-  urgency: string
-  fundingAmount: string
 }
 
 interface SubmissionData {
@@ -33,7 +30,6 @@ interface SubmissionData {
   phone: string
   businessName: string
   businessType: string
-  monthlyRevenue: string
   creditCards: string
   establishedBusiness: string
   strongCreditScore: string
@@ -42,8 +38,6 @@ interface SubmissionData {
   preferredTime: string
   timezone: string
   message: string
-  urgency: string
-  fundingAmount: string
   isEligible: boolean
   eligibilityReason: string
   timestamp: string
@@ -57,7 +51,6 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
     phone: '',
     businessName: '',
     businessType: '',
-    monthlyRevenue: '',
     // Typeform questions
     creditCards: '', // Yes/No
     establishedBusiness: '', // Yes/No
@@ -67,9 +60,7 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
     preferredDate: '',
     preferredTime: '',
     timezone: 'EST',
-    message: '',
-    urgency: '',
-    fundingAmount: ''
+    message: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -107,12 +98,17 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
         if (!formData.email.trim()) newErrors.email = 'Email is required'
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Invalid email format'
         if (!formData.phone.trim()) newErrors.phone = 'Phone is required'
-        else if (!/^\(\d{3}\)\s\d{3}-\d{4}$/.test(formData.phone) && !/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
-          newErrors.phone = 'Invalid phone format'
+        else {
+          // Validar formato de teléfono de USA
+          const phoneDigits = formData.phone.replace(/\D/g, '')
+          if (phoneDigits.length !== 10) {
+            newErrors.phone = 'Phone number must be 10 digits (USA format)'
+          } else if (!/^[2-9]\d{2}[2-9]\d{2}\d{4}$/.test(phoneDigits)) {
+            newErrors.phone = 'Invalid USA phone number format'
+          }
         }
         if (!formData.businessName.trim()) newErrors.businessName = 'Business name is required'
         if (!formData.businessType.trim()) newErrors.businessType = 'Business type is required'
-        if (!formData.monthlyRevenue.trim()) newErrors.monthlyRevenue = 'Monthly revenue is required'
         break
         
       case 2:
@@ -126,7 +122,6 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
         if (determineEligibility()) {
           if (!formData.preferredDate) newErrors.preferredDate = 'Please select a date'
           if (!formData.preferredTime) newErrors.preferredTime = 'Please select a time'
-          if (!formData.fundingAmount) newErrors.fundingAmount = 'Please select funding amount'
         }
         break
     }
@@ -135,12 +130,41 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
     return Object.keys(newErrors).length === 0
   }
 
+  const formatPhoneNumber = (value: string) => {
+    // Remover todos los caracteres no numéricos
+    const phoneNumber = value.replace(/\D/g, '')
+    
+    // Limitar a 10 dígitos
+    const limitedPhoneNumber = phoneNumber.slice(0, 10)
+    
+    // Formatear como (XXX) XXX-XXXX
+    if (limitedPhoneNumber.length >= 6) {
+      return `(${limitedPhoneNumber.slice(0, 3)}) ${limitedPhoneNumber.slice(3, 6)}-${limitedPhoneNumber.slice(6)}`
+    } else if (limitedPhoneNumber.length >= 3) {
+      return `(${limitedPhoneNumber.slice(0, 3)}) ${limitedPhoneNumber.slice(3)}`
+    } else if (limitedPhoneNumber.length > 0) {
+      return `(${limitedPhoneNumber}`
+    }
+    
+    return limitedPhoneNumber
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+    
+    // Formatear número de teléfono automáticamente
+    if (name === 'phone') {
+      const formattedPhone = formatPhoneNumber(value)
+      setFormData(prev => ({
+        ...prev,
+        [name]: formattedPhone
+      }))
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }))
+    }
     
     // Clear error when user starts typing
     if (errors[name]) {
@@ -201,8 +225,7 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
       await sendToEmail(submissionData)
       
       setIsSubmitted(true)
-    } catch (error) {
-      console.error('Error submitting form:', error)
+    } catch {
     } finally {
       setIsSubmitting(false)
     }
@@ -234,8 +257,6 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
 
   const sendToEmail = async (data: SubmissionData) => {
     try {
-      console.log('Sending appointment data:', data)
-      
       // Save to database
       const appointmentResponse = await fetch('/api/appointments', {
         method: 'POST',
@@ -245,16 +266,12 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
         body: JSON.stringify(data),
       })
 
-      console.log('Appointment response status:', appointmentResponse.status)
-
       if (!appointmentResponse.ok) {
         const errorText = await appointmentResponse.text()
-        console.error('Appointment save failed:', errorText)
         throw new Error(`Failed to save appointment: ${errorText}`)
       }
 
-      const appointmentResult = await appointmentResponse.json()
-      console.log('Appointment saved successfully:', appointmentResult)
+      await appointmentResponse.json()
 
       // Also send email notification (if you have email service)
       try {
@@ -267,17 +284,13 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
         })
 
         if (!emailResponse.ok) {
-          console.warn('Failed to send email notification, but appointment was saved')
-        } else {
-          const emailResult = await emailResponse.json()
-          console.log('Email notification sent:', emailResult)
+          // Silent fail for email service
         }
-      } catch (emailError) {
-        console.warn('Email service error (appointment still saved):', emailError)
+      } catch {
+        // Silent fail for email service
       }
-    } catch (error) {
-      console.error('Error submitting application:', error)
-      throw error
+    } catch {
+      throw new Error('Failed to send appointment data')
     }
   }
 
@@ -288,7 +301,6 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
       phone: '',
       businessName: '',
       businessType: '',
-      monthlyRevenue: '',
       creditCards: '',
       establishedBusiness: '',
       strongCreditScore: '',
@@ -296,9 +308,7 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
       preferredDate: '',
       preferredTime: '',
       timezone: 'EST',
-      message: '',
-      urgency: '',
-      fundingAmount: ''
+      message: ''
     })
     setCurrentStep(1)
     setIsSubmitted(false)
@@ -313,48 +323,48 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 bg-opacity-95 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
-      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full max-h-[98vh] sm:max-h-[95vh] overflow-y-auto shadow-2xl border border-gray-100">
+    <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 bg-opacity-95 backdrop-blur-sm flex items-center justify-center z-50 p-1 sm:p-2 md:p-4">
+      <div className="bg-white rounded-xl sm:rounded-2xl md:rounded-3xl max-w-4xl w-full max-h-[99vh] sm:max-h-[98vh] md:max-h-[95vh] overflow-y-auto shadow-2xl border border-gray-100">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 sm:px-8 py-4 sm:py-6 rounded-t-2xl sm:rounded-t-3xl">
+        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 rounded-t-xl sm:rounded-t-2xl md:rounded-t-3xl">
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2 flex items-center">
-                <Rocket className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3 flex-shrink-0" />
+              <h2 className="text-lg sm:text-xl md:text-3xl font-bold mb-1 sm:mb-2 flex items-center">
+                <Rocket className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 mr-2 sm:mr-3 flex-shrink-0" />
                 <span className="truncate">Get Funded Today</span>
               </h2>
-              <p className="text-blue-100 text-sm sm:text-lg">Let&apos;s secure your business funding</p>
+              <p className="text-blue-100 text-xs sm:text-sm md:text-lg">Let&apos;s secure your business funding</p>
             </div>
             <button
               onClick={handleClose}
-              className="p-2 sm:p-3 hover:bg-blue-500 rounded-full transition-all duration-300 transform hover:scale-110 flex-shrink-0 ml-2"
+              className="p-1.5 sm:p-2 md:p-3 hover:bg-blue-500 rounded-full transition-all duration-300 transform hover:scale-110 flex-shrink-0 ml-2"
             >
-              <X className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
             </button>
           </div>
           
           {/* Progress Bar */}
-          <div className="mt-4 sm:mt-6">
-            <div className="flex items-center justify-center space-x-1 sm:space-x-3">
+          <div className="mt-3 sm:mt-4 md:mt-6">
+            <div className="flex items-center justify-center space-x-1 sm:space-x-2 md:space-x-3">
               {[1, 2, 3, 4, 5].map((step) => (
                 <div key={step} className="flex items-center">
-                  <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-500 ${
+                  <div className={`w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-500 ${
                     step <= currentStep 
                       ? 'bg-white text-blue-600 shadow-lg transform scale-110' 
                       : 'bg-blue-500 text-white'
                   }`}>
-                    {step < currentStep ? <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" /> : step}
+                    {step < currentStep ? <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" /> : step}
                   </div>
                   {step < 5 && (
-                    <div className={`w-6 sm:w-12 h-1 sm:h-2 mx-1 sm:mx-2 rounded-full transition-all duration-500 ${
+                    <div className={`w-4 sm:w-6 md:w-12 h-1 sm:h-1.5 md:h-2 mx-0.5 sm:mx-1 md:mx-2 rounded-full transition-all duration-500 ${
                       step < currentStep ? 'bg-white' : 'bg-blue-500'
                     }`} />
                   )}
                 </div>
               ))}
             </div>
-            <div className="mt-3 sm:mt-4 text-center">
-              <span className="bg-white bg-opacity-20 px-3 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-semibold">
+            <div className="mt-2 sm:mt-3 md:mt-4 text-center">
+              <span className="bg-white bg-opacity-20 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full text-xs sm:text-sm font-semibold">
                 Step {currentStep} of 5
               </span>
             </div>
@@ -362,7 +372,7 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
         </div>
 
         {/* Form Content */}
-        <div className="p-4 sm:p-8">
+        <div className="p-3 sm:p-6 md:p-8">
           {isSubmitted ? (
             <div className="text-center py-12">
               <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
@@ -391,18 +401,18 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Step 1: Personal Information */}
               {currentStep === 1 && (
-                <div className="space-y-6 sm:space-y-8">
-                  <div className="text-center mb-6 sm:mb-8">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg">
-                      <User className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                <div className="space-y-4 sm:space-y-6 md:space-y-8">
+                  <div className="text-center mb-4 sm:mb-6 md:mb-8">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3 md:mb-4 shadow-lg">
+                      <User className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-white" />
                     </div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Personal Information</h3>
-                    <p className="text-gray-600 text-base sm:text-lg">Tell us about yourself and your business</p>
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">Personal Information</h3>
+                    <p className="text-gray-600 text-sm sm:text-base md:text-lg">Tell us about yourself and your business</p>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                    <div className="space-y-2 group">
-                      <label className="block text-sm font-semibold text-gray-800 mb-3 transition-colors duration-300 group-focus-within:text-blue-600">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+                    <div className="space-y-1 sm:space-y-2 group">
+                      <label className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2 sm:mb-3 transition-colors duration-300 group-focus-within:text-blue-600">
                         Full Name *
                       </label>
                       <div className="relative">
@@ -412,7 +422,7 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
                           value={formData.name}
                           onChange={handleInputChange}
                           required
-                          className={`w-full px-4 sm:px-5 py-3 sm:py-4 border-2 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all duration-300 text-base sm:text-lg bg-white placeholder-gray-400 text-blue-900 ${
+                          className={`w-full px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 md:py-4 border-2 rounded-lg sm:rounded-xl focus:ring-2 sm:focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all duration-300 text-sm sm:text-base md:text-lg bg-white placeholder-gray-400 text-blue-900 ${
                             errors.name 
                               ? 'border-red-400 bg-red-50 focus:ring-red-200 focus:border-red-500' 
                               : formData.name 
@@ -479,9 +489,9 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
                       )}
                     </div>
                     
-                    <div className="space-y-2 group">
-                      <label className="block text-sm font-semibold text-gray-800 mb-3 transition-colors duration-300 group-focus-within:text-blue-600">
-                        Phone Number *
+                    <div className="space-y-1 sm:space-y-2 group">
+                      <label className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2 sm:mb-3 transition-colors duration-300 group-focus-within:text-blue-600">
+                        Phone Number (USA) *
                       </label>
                       <div className="relative">
                         <input
@@ -490,32 +500,34 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
                           value={formData.phone}
                           onChange={handleInputChange}
                           required
-                          className={`w-full px-4 sm:px-5 py-3 sm:py-4 border-2 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all duration-300 text-base sm:text-lg bg-white placeholder-gray-400 text-blue-900 ${
+                          maxLength={14}
+                          className={`w-full px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 md:py-4 border-2 rounded-lg sm:rounded-xl focus:ring-2 sm:focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all duration-300 text-sm sm:text-base md:text-lg bg-white placeholder-gray-400 text-blue-900 ${
                             errors.phone 
                               ? 'border-red-400 bg-red-50 focus:ring-red-200 focus:border-red-500' 
-                              : formData.phone && (/^\(\d{3}\)\s\d{3}-\d{4}$/.test(formData.phone) || /^\d{10}$/.test(formData.phone.replace(/\D/g, '')))
+                              : formData.phone && formData.phone.replace(/\D/g, '').length === 10
                                 ? 'border-green-400 bg-green-50' 
                                 : 'border-gray-200 hover:border-gray-300 focus:shadow-lg'
                           }`}
                           placeholder="(555) 123-4567"
                         />
-                        {formData.phone && !errors.phone && (/^\(\d{3}\)\s\d{3}-\d{4}$/.test(formData.phone) || /^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) && (
+                        {formData.phone && !errors.phone && formData.phone.replace(/\D/g, '').length === 10 && (
                           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                            <CheckCircle className="w-5 h-5 text-green-500 animate-pulse" />
+                            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 animate-pulse" />
                           </div>
                         )}
                         {errors.phone && (
                           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                            <AlertCircle className="w-5 h-5 text-red-500 animate-bounce" />
+                            <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 animate-bounce" />
                           </div>
                         )}
                       </div>
                       {errors.phone && (
-                        <p className="text-red-500 text-sm mt-2 flex items-center animate-fadeIn">
-                          <AlertCircle className="w-4 h-4 mr-1" />
+                        <p className="text-red-500 text-xs sm:text-sm mt-1 sm:mt-2 flex items-center animate-fadeIn">
+                          <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                           {errors.phone}
                         </p>
                       )}
+                      <p className="text-xs text-gray-500 mt-1">Format: (XXX) XXX-XXXX</p>
                     </div>
                     
                     <div className="space-y-2 group">
@@ -611,55 +623,6 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
                       )}
                     </div>
                     
-                    <div className="space-y-2 group">
-                      <label className="block text-sm font-semibold text-gray-800 mb-3 transition-colors duration-300 group-focus-within:text-blue-600">
-                        Monthly Revenue *
-                      </label>
-                      <div className="relative">
-                        <select
-                          name="monthlyRevenue"
-                          value={formData.monthlyRevenue}
-                          onChange={handleInputChange}
-                          required
-                          className={`w-full px-5 py-4 border-2 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all duration-300 text-lg bg-white appearance-none cursor-pointer text-blue-900 ${
-                            errors.monthlyRevenue 
-                              ? 'border-red-400 bg-red-50 focus:ring-red-200 focus:border-red-500' 
-                              : formData.monthlyRevenue 
-                                ? 'border-green-400 bg-green-50' 
-                                : 'border-gray-200 hover:border-gray-300 focus:shadow-lg'
-                          }`}
-                        >
-                          <option value="" className="text-blue-900">Select monthly revenue</option>
-                          <option value="Under $5,000" className="text-blue-900">Under $5,000</option>
-                          <option value="$5,000 - $10,000" className="text-blue-900">$5,000 - $10,000</option>
-                          <option value="$10,000 - $25,000" className="text-blue-900">$10,000 - $25,000</option>
-                          <option value="$25,000 - $50,000" className="text-blue-900">$25,000 - $50,000</option>
-                          <option value="$50,000 - $100,000" className="text-blue-900">$50,000 - $100,000</option>
-                          <option value="Over $100,000" className="text-blue-900">Over $100,000</option>
-                        </select>
-                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </div>
-                        {formData.monthlyRevenue && !errors.monthlyRevenue && (
-                          <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
-                            <CheckCircle className="w-5 h-5 text-green-500 animate-pulse" />
-                          </div>
-                        )}
-                        {errors.monthlyRevenue && (
-                          <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
-                            <AlertCircle className="w-5 h-5 text-red-500 animate-bounce" />
-                          </div>
-                        )}
-                      </div>
-                      {errors.monthlyRevenue && (
-                        <p className="text-red-500 text-sm mt-2 flex items-center animate-fadeIn">
-                          <AlertCircle className="w-4 h-4 mr-1" />
-                          {errors.monthlyRevenue}
-                        </p>
-                      )}
-                    </div>
                   </div>
                 </div>
               )}
@@ -921,7 +884,7 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
                         </p>
                         <p className={`text-sm ${determineEligibility() ? 'text-green-600' : 'text-yellow-600'}`}>
                           {determineEligibility() 
-                            ? 'You meet all the requirements. Let&apos;s schedule your consultation call to get you funded!'
+                            ? 'You meet all the requirements! Let&apos;s schedule your consultation call to get you funded!'
                             : `Reason: ${getEligibilityReason()}. We&apos;ll help you improve your profile and get qualified.`
                           }
                         </p>
@@ -933,32 +896,32 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
 
               {/* Step 4: Schedule Call (Only for Eligible Users) */}
               {currentStep === 4 && (
-                <div className="space-y-6">
-                  <div className="text-center mb-6">
-                    <Calendar className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                    <h3 className="text-xl font-semibold text-gray-900">Schedule Your Call</h3>
-                    <p className="text-gray-600">Let&apos;s get you funded! Choose your preferred time</p>
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="text-center mb-4 sm:mb-6">
+                    <Calendar className="w-10 h-10 sm:w-12 sm:h-12 text-green-500 mx-auto mb-2 sm:mb-3" />
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Schedule Your Call</h3>
+                    <p className="text-gray-600 text-sm sm:text-base">Let&apos;s get you funded! Choose your preferred time</p>
                   </div>
                   
-                  <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-xl p-6 mb-6">
+                  <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-lg sm:rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
                     <div className="text-center">
-                      <div className="flex items-center justify-center mb-3">
-                        <Star className="w-6 h-6 text-yellow-500 mr-2" />
-                        <h4 className="text-lg font-semibold text-green-800 flex items-center">
-                          <CheckCircle className="w-5 h-5 mr-2 text-green-600" />
+                      <div className="flex items-center justify-center mb-2 sm:mb-3">
+                        <Star className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500 mr-2" />
+                        <h4 className="text-base sm:text-lg font-semibold text-green-800 flex items-center">
+                          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600" />
                           You&apos;re Eligible!
                         </h4>
                       </div>
-                      <p className="text-green-700">
+                      <p className="text-green-700 text-sm sm:text-base">
                         You meet all the requirements for business funding. Let&apos;s schedule your consultation call to get you funded with $50K-$150K at 0% interest!
                       </p>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2 group">
-                      <label className="block text-sm font-semibold text-gray-800 mb-3 transition-colors duration-300 group-focus-within:text-green-600">
-                        <Calendar className="w-5 h-5 inline mr-2" />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+                    <div className="space-y-1 sm:space-y-2 group">
+                      <label className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2 sm:mb-3 transition-colors duration-300 group-focus-within:text-green-600">
+                        <Calendar className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
                         Preferred Date *
                       </label>
                       <div className="relative">
@@ -970,7 +933,7 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
                           required
                           min={new Date().toISOString().split('T')[0]}
                           max={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
-                          className={`w-full px-5 py-4 border-2 rounded-xl focus:ring-4 focus:ring-green-200 focus:border-green-500 transition-all duration-300 text-lg bg-white text-blue-900 cursor-pointer ${
+                          className={`w-full px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 md:py-4 border-2 rounded-lg sm:rounded-xl focus:ring-2 sm:focus:ring-4 focus:ring-green-200 focus:border-green-500 transition-all duration-300 text-sm sm:text-base md:text-lg bg-white text-blue-900 cursor-pointer ${
                             errors.preferredDate 
                               ? 'border-red-400 bg-red-50 focus:ring-red-200 focus:border-red-500' 
                               : formData.preferredDate 
@@ -980,37 +943,37 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
                         />
                         {formData.preferredDate && !errors.preferredDate && (
                           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                            <CheckCircle className="w-5 h-5 text-green-500 animate-pulse" />
+                            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 animate-pulse" />
                           </div>
                         )}
                         {errors.preferredDate && (
                           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                            <AlertCircle className="w-5 h-5 text-red-500 animate-bounce" />
+                            <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 animate-bounce" />
                           </div>
                         )}
                       </div>
                       {errors.preferredDate && (
-                        <p className="text-red-500 text-sm mt-2 flex items-center animate-fadeIn">
-                          <AlertCircle className="w-4 h-4 mr-1" />
+                        <p className="text-red-500 text-xs sm:text-sm mt-1 sm:mt-2 flex items-center animate-fadeIn">
+                          <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                           {errors.preferredDate}
                         </p>
                       )}
                       {formData.preferredDate && !errors.preferredDate && (
-                        <p className="text-green-600 text-sm mt-2 flex items-center">
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Date selected: {new Date(formData.preferredDate).toLocaleDateString('en-US', { 
-                            weekday: 'long', 
-                            year: 'numeric', 
-                            month: 'long', 
+                        <p className="text-green-600 text-xs sm:text-sm mt-1 sm:mt-2 flex items-center">
+                          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                          <span className="hidden sm:inline">Date selected: </span>
+                          {new Date(formData.preferredDate).toLocaleDateString('en-US', { 
+                            weekday: 'short', 
+                            month: 'short', 
                             day: 'numeric' 
                           })}
                         </p>
                       )}
                     </div>
                     
-                    <div className="space-y-2 group">
-                      <label className="block text-sm font-semibold text-gray-800 mb-3 transition-colors duration-300 group-focus-within:text-green-600">
-                        <Clock className="w-5 h-5 inline mr-2" />
+                    <div className="space-y-1 sm:space-y-2 group">
+                      <label className="block text-xs sm:text-sm font-semibold text-gray-800 mb-2 sm:mb-3 transition-colors duration-300 group-focus-within:text-green-600">
+                        <Clock className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
                         Preferred Time *
                       </label>
                       <div className="relative">
@@ -1019,7 +982,7 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
                           value={formData.preferredTime}
                           onChange={handleInputChange}
                           required
-                          className={`w-full px-5 py-4 border-2 rounded-xl focus:ring-4 focus:ring-green-200 focus:border-green-500 transition-all duration-300 text-lg bg-white appearance-none cursor-pointer text-blue-900 ${
+                          className={`w-full px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 md:py-4 border-2 rounded-lg sm:rounded-xl focus:ring-2 sm:focus:ring-4 focus:ring-green-200 focus:border-green-500 transition-all duration-300 text-sm sm:text-base md:text-lg bg-white appearance-none cursor-pointer text-blue-900 ${
                             errors.preferredTime 
                               ? 'border-red-400 bg-red-50 focus:ring-red-200 focus:border-red-500' 
                               : formData.preferredTime 
@@ -1033,31 +996,32 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
                           ))}
                         </select>
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
                         </div>
                         {formData.preferredTime && !errors.preferredTime && (
-                          <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
-                            <CheckCircle className="w-5 h-5 text-green-500 animate-pulse" />
+                          <div className="absolute right-8 sm:right-10 top-1/2 transform -translate-y-1/2">
+                            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 animate-pulse" />
                           </div>
                         )}
                         {errors.preferredTime && (
-                          <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
-                            <AlertCircle className="w-5 h-5 text-red-500 animate-bounce" />
+                          <div className="absolute right-8 sm:right-10 top-1/2 transform -translate-y-1/2">
+                            <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 animate-bounce" />
                           </div>
                         )}
                       </div>
                       {errors.preferredTime && (
-                        <p className="text-red-500 text-sm mt-2 flex items-center animate-fadeIn">
-                          <AlertCircle className="w-4 h-4 mr-1" />
+                        <p className="text-red-500 text-xs sm:text-sm mt-1 sm:mt-2 flex items-center animate-fadeIn">
+                          <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                           {errors.preferredTime}
                         </p>
                       )}
                       {formData.preferredTime && !errors.preferredTime && (
-                        <p className="text-green-600 text-sm mt-2 flex items-center">
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Time selected: {formData.preferredTime}
+                        <p className="text-green-600 text-xs sm:text-sm mt-1 sm:mt-2 flex items-center">
+                          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                          <span className="hidden sm:inline">Time selected: </span>
+                          {formData.preferredTime}
                         </p>
                       )}
                     </div>
@@ -1081,47 +1045,8 @@ const ScheduleCallModal: React.FC<ScheduleCallModalProps> = ({ isOpen, onClose }
                       </select>
                     </div>
                     
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Funding Amount Needed *
-                      </label>
-                      <select
-                        name="fundingAmount"
-                        value={formData.fundingAmount}
-                        onChange={handleInputChange}
-                        required
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-blue-900 ${
-                          errors.fundingAmount ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                      >
-                        <option value="" className="text-blue-900">Select amount</option>
-                        <option value="$50,000 - $75,000" className="text-blue-900">$50,000 - $75,000</option>
-                        <option value="$75,000 - $100,000" className="text-blue-900">$75,000 - $100,000</option>
-                        <option value="$100,000 - $125,000" className="text-blue-900">$100,000 - $125,000</option>
-                        <option value="$125,000 - $150,000" className="text-blue-900">$125,000 - $150,000</option>
-                        <option value="Over $150,000" className="text-blue-900">Over $150,000</option>
-                      </select>
-                      {errors.fundingAmount && <p className="text-red-500 text-sm mt-1">{errors.fundingAmount}</p>}
-                    </div>
                   </div>
                   
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Urgency Level
-                    </label>
-                    <select
-                      name="urgency"
-                      value={formData.urgency}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-blue-900"
-                    >
-                      <option value="" className="text-blue-900">Select urgency</option>
-                      <option value="ASAP - Within 1 week" className="text-blue-900">ASAP - Within 1 week</option>
-                      <option value="Soon - Within 2-4 weeks" className="text-blue-900">Soon - Within 2-4 weeks</option>
-                      <option value="Flexible - Within 1-2 months" className="text-blue-900">Flexible - Within 1-2 months</option>
-                      <option value="Planning ahead - 2+ months" className="text-blue-900">Planning ahead - 2+ months</option>
-                    </select>
-                  </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">

@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+// import Link from 'next/link'
 import { CheckCircle, Clock, DollarSign, TrendingUp, Shield, Building2, CreditCard, Gift } from 'lucide-react'
 
 const BusinessFinancing = () => {
@@ -61,7 +61,7 @@ const BusinessFinancing = () => {
         {/* Not 100% there yet message */}
         <div className="text-center mb-16">
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Not 100% there yet? I can help you fix your profile and get qualified.
+          Not 100% there yet? Let’s get your profile fixed to get qualified.
           </p>
         </div>
 
@@ -183,62 +183,97 @@ const BusinessFinancing = () => {
         <div className="mb-20">
           <h3 className="text-3xl font-bold text-gray-900 text-center mb-12">Simple and Efficient Process</h3>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            
-            {/* Step 1 */}
-            <div className="text-center relative">
-              <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6 relative z-10">
-                <span className="text-2xl font-bold text-white">1</span>
+          {/* Desktop Layout */}
+          <div className="hidden md:block">
+            <div className="grid md:grid-cols-3 gap-8 relative">
+              
+              {/* Background connecting lines */}
+              <div className="absolute top-10 left-0 w-full h-0.5 bg-gradient-to-r from-blue-300 via-green-300 to-purple-300 z-0"></div>
+              
+              {/* Step 1 */}
+              <div className="text-center relative">
+                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6 relative z-10 shadow-lg">
+                  <span className="text-2xl font-bold text-white">1</span>
+                </div>
+                <h4 className="text-xl font-bold text-gray-900 mb-4">Book a Call</h4>
+                <p className="text-gray-600 leading-relaxed">
+                  Answer a few quick questions and schedule a call to get started.
+                </p>
               </div>
-              <h4 className="text-xl font-bold text-gray-900 mb-4">Book a Call</h4>
-              <p className="text-gray-600 leading-relaxed">
-                Answer a few quick questions and schedule a call to get started.
-              </p>
-              {/* Connector Line */}
-              <div className="hidden md:block absolute top-10 left-1/2 w-full h-0.5 bg-gradient-to-r from-blue-300 to-cyan-300 z-0"></div>
-            </div>
 
-            {/* Step 2 */}
-            <div className="text-center relative">
-              <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6 relative z-10">
-                <span className="text-2xl font-bold text-white">2</span>
+              {/* Step 2 */}
+              <div className="text-center relative">
+                <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6 relative z-10 shadow-lg">
+                  <span className="text-2xl font-bold text-white">2</span>
+                </div>
+                <h4 className="text-xl font-bold text-gray-900 mb-4">Qualify</h4>
+                <p className="text-gray-600 leading-relaxed">
+                  We&apos;ll analyze your credit and business profile, then either start the funding process or fix any issues holding you back.
+                </p>
               </div>
-              <h4 className="text-xl font-bold text-gray-900 mb-4">Qualify</h4>
-              <p className="text-gray-600 leading-relaxed">
-                We&apos;ll analyze your credit and business profile, then either start the funding process or fix any issues holding you back.
-              </p>
-              {/* Connector Line */}
-              <div className="hidden md:block absolute top-10 left-1/2 w-full h-0.5 bg-gradient-to-r from-green-300 to-purple-300 z-0"></div>
-            </div>
 
-            {/* Step 3 */}
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">3</span>
+              {/* Step 3 */}
+              <div className="text-center relative">
+                <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 relative z-10 shadow-lg">
+                  <span className="text-2xl font-bold text-white">3</span>
+                </div>
+                <h4 className="text-xl font-bold text-gray-900 mb-4">Receive Funding</h4>
+                <p className="text-gray-600 leading-relaxed">
+                  Secure $50K-$150K in business credit within 1-3 weeks—fast and at 0% interest.
+                </p>
               </div>
-              <h4 className="text-xl font-bold text-gray-900 mb-4">Receive Funding</h4>
-              <p className="text-gray-600 leading-relaxed">
-                Secure $50K-$150K in business credit within 1-3 weeks—fast and at 0% interest.
-              </p>
+            </div>
+          </div>
+
+          {/* Mobile & Tablet Timeline Layout */}
+          <div className="md:hidden">
+            <div className="relative">
+              {/* Vertical timeline line */}
+              <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-300 via-green-300 to-purple-300"></div>
+              
+              {/* Step 1 */}
+              <div className="relative flex items-start space-x-6 mb-12 animate-fade-in-up" style={{animationDelay: '0s'}}>
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center relative z-10 shadow-lg">
+                  <span className="text-xl font-bold text-white">1</span>
+                </div>
+                <div className="flex-1 pt-2">
+                  <h4 className="text-lg font-bold text-gray-900 mb-2">Book a Call</h4>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Answer a few quick questions and schedule a call to get started.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className="relative flex items-start space-x-6 mb-12 animate-fade-in-up" style={{animationDelay: '0.5s'}}>
+                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center relative z-10 shadow-lg">
+                  <span className="text-xl font-bold text-white">2</span>
+                </div>
+                <div className="flex-1 pt-2">
+                  <h4 className="text-lg font-bold text-gray-900 mb-2">Qualify</h4>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    We&apos;ll analyze your credit and business profile, then either start the funding process or fix any issues holding you back.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="relative flex items-start space-x-6 animate-fade-in-up" style={{animationDelay: '1s'}}>
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center relative z-10 shadow-lg">
+                  <span className="text-xl font-bold text-white">3</span>
+                </div>
+                <div className="flex-1 pt-2">
+                  <h4 className="text-lg font-bold text-gray-900 mb-2">Receive Funding</h4>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Secure $50K-$150K in business credit within 1-3 weeks—fast and at 0% interest.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
 
-        {/* CTA Section */}
-        <div className="text-center mt-20">
-          <h3 className="text-3xl font-bold text-gray-900 mb-4">Ready to Access Business Funding?</h3>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Book your call today and let&apos;s turn your business credit into real working capital.
-          </p>
-          <Link 
-            href="/application"
-            className="inline-flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white rounded-2xl transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
-          >
-            <DollarSign className="w-6 h-6" />
-            <span>Get Funded Today</span>
-          </Link>
-        </div>
       </div>
       
     </section>

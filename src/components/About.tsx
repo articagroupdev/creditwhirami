@@ -50,7 +50,7 @@ const About = () => {
               <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">How You Get Funded</h3>
               <div className="space-y-4 sm:space-y-6">
                 <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                  I&apos;m Rami Noureddine, a former Business Banker who saw too many business owners get denied the funding they needed. 
+                  I&apos;m Rami Noureddine, a former US Business Banker who saw too many business owners get denied the funding they needed. 
                   Back then, my job was just to take applications—and it frustrated me knowing exactly what banks were looking for 
                   but not being able to guide people through it.
                 </p>

@@ -50,8 +50,8 @@ const Contact = () => {
                     <Phone className="w-6 h-6 text-purple-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">WhatsApp</h4>
-                    <p className="text-gray-600">+1 (786) 883-5543</p>
+                    <h4 className="font-semibold text-gray-900">Number Phone</h4>
+                    <p className="text-gray-600">+1 (786) 620-4231</p>
                   </div>
                 </div>
                 
@@ -72,7 +72,7 @@ const Contact = () => {
           {/* Contact Form */}
           <div className="card p-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-6">
-              Request Your Free Consultation
+            Get your Business Funded
             </h3>
             
             <div className="space-y-6">
@@ -87,10 +87,6 @@ const Contact = () => {
                 >
                   Start Free Consultation
                 </Link>
-                
-                <p className="text-sm text-gray-500 mt-4">
-                  Complete the form to receive personalized guidance and be redirected to WhatsApp for immediate assistance.
-                </p>
               </div>
               
               <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 mt-6">

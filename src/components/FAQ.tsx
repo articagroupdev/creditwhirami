@@ -9,28 +9,32 @@ const FAQ = () => {
 
   const faqs = [
     {
-      question: 'How long does it take to see results in my credit score?',
-      answer: 'While results vary based on individual circumstances, most clients experience significant improvements within 30-60 days. Our average client sees a remarkable 150-point increase within just 90 days.'
+      question: 'What exactly do you offer?',
+      answer: 'We provide consulting services that guide you through the process of preparing your credit and business profile to qualify for 0% interest business funding. This includes leveraging my experience in securing business credit, along with the proven strategies I\'ve used to successfully fund my own company and support other business owners nationwide.'
     },
     {
-      question: 'What does the credit repair service include?',
-      answer: 'Our comprehensive service includes a thorough credit report analysis, identification and removal of negative items, strategic disputes with credit bureaus, personalized score improvement strategies, and ongoing monitoring until you achieve your financial goals.'
+      question: 'How much funding can I qualify for?',
+      answer: 'Most clients qualify for $50K–$150K in business credit at 0% interest for up to 12 months. The exact amount depends on your credit profile, business history, and overall financial picture.'
     },
     {
-      question: 'Is credit repair legal?',
-      answer: 'Absolutely. Credit repair is completely legal and protected under federal law. The Fair Credit Reporting Act (FCRA) grants us the legal right to dispute any inaccurate, incomplete, or unverifiable information on your credit report.'
+      question: 'Will applying hurt my personal credit?',
+      answer: 'The process does involve hard inquiries, but these are minimal compared to the value of the funding you\'ll receive. Once approved, the accounts report to your business credit, keeping your personal utilization low.'
     },
     {
-      question: 'How much does the service cost?',
-      answer: 'We offer customized plans tailored to your specific needs. Your initial consultation is completely free with no obligation. During this session, we&apos;ll thoroughly evaluate your situation and provide a personalized action plan with completely transparent pricing.'
+      question: 'Do I need business revenue to qualify?',
+      answer: 'No. Unlike traditional loans, this funding does not require you to show business revenue. Instead, approval is based on your personal credit strength and business setup.'
     },
     {
-      question: 'What guarantees do you offer?',
-      answer: 'We stand behind our work with a 100% satisfaction guarantee. If you don&apos;t see significant credit score improvements within our agreed timeframe, we&apos;ll provide a full refund. With our proven 98% success rate, we&apos;re confident in delivering results.'
+      question: 'How long does the process take?',
+      answer: 'Once qualified, you can expect to secure your funding in as little as 1–3 weeks.'
     },
     {
-      question: 'Can I do it myself without professional help?',
-      answer: 'While DIY credit repair is possible, the process is often complex, time-consuming, and frequently ineffective. Our specialized expertise, established relationships with credit bureaus, and proven strategies can dramatically accelerate your results while saving you countless hours of frustration.'
+      question: 'What are the service fees?',
+      answer: 'Our service fee is a fixed price, which depends on how much funding you\'re able to secure. Because every profile is different, fees are tailored to reflect the level of funding obtained.'
+    },
+    {
+      question: 'What type of credit will I receive?',
+      answer: 'We help you access business credit cards that come with: 0% interest for up to 12 months, flexible repayment options, reward points and travel benefits, and the ability to separate business and personal expenses.'
     }
   ]
 
