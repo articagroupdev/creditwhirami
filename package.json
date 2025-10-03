@@ -7,6 +7,7 @@
     "dev:network": "node scripts/network-info.js && next dev -H 0.0.0.0 -p 3000",
     "dev:local": "next dev -p 3000",
     "build": "next build",
+    "build:static": "next build && next export",
     "start": "node scripts/network-info.js && next start -H 0.0.0.0 -p 3000",
     "start:network": "node scripts/network-info.js && next start -H 0.0.0.0 -p 3000",
     "network-info": "node scripts/network-info.js",

@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Menu, X, Phone, Mail } from 'lucide-react'
+import ScheduleCallModal from './ScheduleCallModal'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -117,13 +119,13 @@ const Header = () => {
               </div>
               
               {/* CTA Button */}
-              <Link 
-                href="/application"
+              <button 
+                onClick={() => setIsModalOpen(true)}
                 className="hidden lg:inline-block bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold px-3 lg:px-5 py-2 lg:py-2.5 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-sm lg:text-sm"
               >
                 <span className="hidden xl:inline">Get your Business Funded</span>
                 <span className="inline xl:hidden">Get Funded</span>
-              </Link>
+              </button>
             </div>
           </div>
           
@@ -153,13 +155,13 @@ const Header = () => {
               <Phone className="w-4 h-4" />
               <span className="text-xs lg:text-sm font-medium hidden lg:inline">Call</span>
             </a>
-            <Link 
-              href="/application"
+            <button 
+              onClick={() => setIsModalOpen(true)}
               className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold px-3 lg:px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md text-xs lg:text-sm"
             >
               <span className="hidden lg:inline">Get Funded</span>
               <span className="lg:hidden">Funded</span>
-            </Link>
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -290,19 +292,26 @@ const Header = () => {
                 </div>
                 
                 {/* CTA Button */}
-                <Link 
-                  href="/application"
-                  onClick={() => setIsMenuOpen(false)}
+                <button 
+                  onClick={() => {
+                    setIsModalOpen(true)
+                    setIsMenuOpen(false)
+                  }}
                   className="block w-full text-center bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold px-4 py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                   Get your Business Funded
-                </Link>
+                </button>
               </div>
             </div>
           </div>
         )}
       </div>
       
+      {/* Modal */}
+      <ScheduleCallModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </header>
   )
 }

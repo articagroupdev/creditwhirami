@@ -1,9 +1,11 @@
 'use client'
 
-import Link from 'next/link'
+import { useState } from 'react'
 import Header from './Header'
+import ScheduleCallModal from './ScheduleCallModal'
 
 const Hero = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800">
@@ -71,8 +73,8 @@ const Hero = () => {
             
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-2 sm:pt-4 justify-center md:justify-start">
-              <Link 
-                href="/application"
+              <button 
+                onClick={() => setIsModalOpen(true)}
                 className="inline-flex items-center justify-center bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
               >
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -80,7 +82,7 @@ const Hero = () => {
                 </svg>
                 <span className="hidden sm:inline">Get your Business Funded</span>
                 <span className="sm:hidden">Get Funded</span>
-              </Link>
+              </button>
             </div>
           </div>
           
@@ -259,6 +261,11 @@ const Hero = () => {
         </div>
       </div>
       
+      {/* Modal */}
+      <ScheduleCallModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </main>
   )
 }

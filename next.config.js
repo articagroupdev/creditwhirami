@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // output: 'export', // Comentado para usar Netlify Functions
+  // trailingSlash: true, // Comentado para usar Netlify Functions
   // experimental: {
   //   optimizeCss: true,
   // },
@@ -13,6 +15,7 @@ const nextConfig = {
       },
     ],
     formats: ['image/webp', 'image/avif'],
+    unoptimized: true, // Deshabilitar optimización de imágenes para evitar problemas en deploy
   },
   // Video optimization
   async headers() {

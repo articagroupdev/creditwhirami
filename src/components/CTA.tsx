@@ -1,9 +1,11 @@
 'use client'
 
-import Link from 'next/link'
+import { useState } from 'react'
 import { ArrowRight, DollarSign } from 'lucide-react'
+import ScheduleCallModal from './ScheduleCallModal'
 
 const CTA = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   return (
     <section className="py-16 sm:py-20 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600">
@@ -20,15 +22,15 @@ const CTA = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center pt-6 sm:pt-8">
-            <Link 
-              href="/application"
+            <button 
+              onClick={() => setIsModalOpen(true)}
               className="group inline-flex items-center bg-white text-blue-600 hover:text-blue-700 font-bold text-lg sm:text-xl px-8 sm:px-12 py-4 sm:py-6 rounded-xl sm:rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-white/20"
             >
               <DollarSign className="mr-2 sm:mr-3 w-5 h-5 sm:w-6 sm:h-6" />
               <span className="hidden sm:inline">Get Funded Today</span>
               <span className="sm:hidden">Get Funded</span>
               <ArrowRight className="ml-2 sm:ml-3 w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform duration-300" />
-            </Link>
+            </button>
             
             <div className="text-center sm:text-left space-y-1">
               <p className="text-blue-100 text-xs sm:text-sm">
@@ -53,6 +55,12 @@ const CTA = () => {
           </div>
         </div>
       </div>
+      
+      {/* Modal */}
+      <ScheduleCallModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </section>
   )
 }
